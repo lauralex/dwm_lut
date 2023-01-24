@@ -71,7 +71,7 @@ namespace DwmLutGUI
 
         private static void CopyOrConvertLut(string source, string dest)
         {
-            var extension = source.Split('.').Last();
+            var extension = source.Split('.').Last().ToLower();
             switch (extension)
             {
                 case "cube":
