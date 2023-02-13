@@ -11,12 +11,12 @@
         SnapsToDevicePixels="True">
     <StackPanel Margin="6">
         <TextBlock FontSize="15" HorizontalAlignment="Center" TextAlignment="Center">
-            dwm_lut v3.8 by ledoge
+            dwm_lut v3.9.2 by lauralex (original by ledoge)
         </TextBlock>
         <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
             Licensed under GPLv3 <LineBreak /> <LineBreak />
             Source code and releases hosted at <LineBreak />
-            <Hyperlink RequestNavigate="OnRequestNavigate" NavigateUri="https://github.com/ledoge/dwm_lut">https://github.com/ledoge/dwm_lut</Hyperlink>
+            <Hyperlink RequestNavigate="OnRequestNavigate" NavigateUri="https://github.com/lauralex/dwm_lut">https://github.com/lauralex/dwm_lut</Hyperlink>
         </TextBlock>
     </StackPanel>
 </Window>
