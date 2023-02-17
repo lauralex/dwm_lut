@@ -56,14 +56,39 @@
                 </WrapPanel>
             </Grid>
             <DataGrid SelectedItem="{Binding SelectedMonitor}" ItemsSource="{Binding Monitors}" RowHeaderWidth="0"
-                      IsReadOnly="True" AutoGenerateColumns="False" DockPanel.Dock="Bottom" Margin="0,0,0,6"
+                      IsReadOnly="False" AutoGenerateColumns="False" DockPanel.Dock="Bottom" Margin="0,0,0,6"
                       CanUserReorderColumns="False" CanUserSortColumns="False" CanUserResizeColumns="False">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="#" Binding="{Binding SourceId}" />
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-                    <DataGridTextColumn Header="Connector" Binding="{Binding Connector}" />
-                    <DataGridTextColumn Header="Position" Binding="{Binding Position}" />
-                    <DataGridTextColumn Header="SDR LUT" Width="*" Binding="{Binding SdrLutFilename}" />
+                    <DataGridTextColumn Header="#" Binding="{Binding SourceId}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Connector" Binding="{Binding Connector}" IsReadOnly="True" />
+                    <DataGridTextColumn Header="Position" Binding="{Binding Position}" IsReadOnly="True" />
+                    <DataGridTemplateColumn Header="SDR LUT" Width="*" IsReadOnly="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding SdrLutFilename, Mode=OneWay}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding SdrLuts}" SelectedItem="{Binding SdrLutPath, UpdateSourceTrigger=PropertyChanged}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Button Content="-" Click="RemoveSdrLut_Click" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.HeaderTemplate>
+                    </DataGridTemplateColumn>
+                    <!-- <DataGridTextColumn Header="SDR LUT" Width="*" Binding="{Binding SdrLutFilename}" /> -->
                     <DataGridTextColumn Header="HDR LUT" Width="*" Binding="{Binding HdrLutFilename}">
                         <DataGridTextColumn.CellStyle>
                             <Style TargetType="DataGridCell">

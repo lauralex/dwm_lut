@@ -6,6 +6,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace DwmLutGUI
@@ -39,6 +41,14 @@ namespace DwmLutGUI
             UpdateMonitors();
 
             CanApply = !Injector.NoDebug;
+            MonitorData.StaticPropertyChanged += MonitorDataOnStaticPropertyChanged;
+        }
+
+        private void MonitorDataOnStaticPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(SdrLutPath));
+            OnPropertyChanged(nameof(HdrLutPath));
+            SaveConfig();
         }
 
         public string ActiveText
@@ -76,7 +86,8 @@ namespace DwmLutGUI
                 _allMonitors.Select(x =>
                     new XElement("monitor", new XAttribute("path", x.DevicePath),
                         x.SdrLutPath != null ? new XAttribute("sdr_lut", x.SdrLutPath) : null,
-                        x.HdrLutPath != null ? new XAttribute("hdr_lut", x.HdrLutPath) : null)));
+                        x.HdrLutPath != null ? new XAttribute("hdr_lut", x.HdrLutPath) : null,
+                        x.SdrLuts != null ? new XElement("sdr_luts", x.SdrLuts.Select(s => new XElement("sdr_lut", s))) : null)));
 
             xElem.Save(_configPath);
 
@@ -170,9 +181,10 @@ namespace DwmLutGUI
                     sdrLutPath = (string)settings.Attribute("sdr_lut");
                     hdrLutPath = (string)settings.Attribute("hdr_lut");
                 }
-
+                var sdrLutPaths = settings?.Element("sdr_luts")?.Elements("sdr_lut").Select(x => (string)x).ToList();
                 var monitor = new MonitorData(devicePath, path.DisplaySource.SourceId + 1, name, connector, position,
                     sdrLutPath, hdrLutPath);
+                if (sdrLutPaths != null) monitor.SdrLuts = new ObservableCollection<string>(sdrLutPaths);
                 _allMonitors.Add(monitor);
                 Monitors.Add(monitor);
             }
@@ -187,7 +199,10 @@ namespace DwmLutGUI
                     var sdrLutPath = (string)monitor.Attribute("sdr_lut");
                     var hdrLutPath = (string)monitor.Attribute("hdr_lut");
 
-                    _allMonitors.Add(new MonitorData(path, sdrLutPath, hdrLutPath));
+                    var sdrLutPaths = monitor.Element("sdr_luts")?.Elements("sdr_lut").Select(x => (string)x).ToList();
+                    var newMonitorData = new MonitorData(path, sdrLutPath, hdrLutPath);
+                    newMonitorData.SdrLuts = new ObservableCollection<string>(sdrLutPaths);
+                    _allMonitors.Add(newMonitorData);
                 }
             }
 

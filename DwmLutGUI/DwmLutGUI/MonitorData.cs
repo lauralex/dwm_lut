@@ -1,11 +1,16 @@
-﻿using System.ComponentModel;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
+using System.Windows.Input;
 
 namespace DwmLutGUI
 {
     public class MonitorData : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+        public static event PropertyChangedEventHandler StaticPropertyChanged;
 
         private string _sdrLutPath;
         private string _hdrLutPath;
@@ -13,6 +18,7 @@ namespace DwmLutGUI
         public MonitorData(string devicePath, uint sourceId, string name, string connector, string position,
             string sdrLutPath, string hdrLutPath)
         {
+            SdrLuts = new ObservableCollection<string>();
             DevicePath = devicePath;
             SourceId = sourceId;
             Name = name;
@@ -24,6 +30,7 @@ namespace DwmLutGUI
 
         public MonitorData(string devicePath, string sdrLutPath, string hdrLutPath)
         {
+            SdrLuts = new ObservableCollection<string>();
             DevicePath = devicePath;
             SdrLutPath = sdrLutPath;
             HdrLutPath = hdrLutPath;
@@ -35,13 +42,19 @@ namespace DwmLutGUI
         public string Connector { get; }
         public string Position { get; }
 
+        public ObservableCollection<string> SdrLuts { get; set; }
+
+
         public string SdrLutPath
         {
             set
             {
                 if (value == _sdrLutPath) return;
+                if (!SdrLuts.Contains(value))
+                    SdrLuts.Add(value);
                 _sdrLutPath = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SdrLutFilename)));
+                StaticPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SdrLutFilename)));
             }
             get => _sdrLutPath;
         }
@@ -53,6 +66,7 @@ namespace DwmLutGUI
                 if (value == _hdrLutPath) return;
                 _hdrLutPath = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HdrLutFilename)));
+                StaticPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HdrLutFilename)));
             }
             get => _hdrLutPath;
         }

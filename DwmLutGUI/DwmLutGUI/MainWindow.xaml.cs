@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -238,5 +239,14 @@ namespace DwmLutGUI
             Thread.Sleep(50);
             overlay.Close();
         }
+
+        private void RemoveSdrLut_Click(object sender, RoutedEventArgs e)
+        {
+            var monitor = _viewModel.SelectedMonitor;
+            if (monitor == null) return;
+            monitor.SdrLuts.Remove(monitor.SdrLutPath);
+            monitor.SdrLutPath = monitor.SdrLuts.FirstOrDefault();
+        }
+
     }
 }
