@@ -56,7 +56,7 @@
                 </WrapPanel>
             </Grid>
             <DataGrid SelectedItem="{Binding SelectedMonitor}" ItemsSource="{Binding Monitors}" RowHeaderWidth="0"
-                      IsReadOnly="False" AutoGenerateColumns="False" DockPanel.Dock="Bottom" Margin="0,0,0,6"
+                      IsReadOnly="{Binding IsActive}" AutoGenerateColumns="False" DockPanel.Dock="Bottom" Margin="0,0,0,6"
                       CanUserReorderColumns="False" CanUserSortColumns="False" CanUserResizeColumns="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="#" Binding="{Binding SourceId}" IsReadOnly="True" />
@@ -89,13 +89,31 @@
                         </DataGridTemplateColumn.HeaderTemplate>
                     </DataGridTemplateColumn>
                     <!-- <DataGridTextColumn Header="SDR LUT" Width="*" Binding="{Binding SdrLutFilename}" /> -->
-                    <DataGridTextColumn Header="HDR LUT" Width="*" Binding="{Binding HdrLutFilename}">
-                        <DataGridTextColumn.CellStyle>
-                            <Style TargetType="DataGridCell">
-                                <Setter Property="Margin" Value="0,0,-1,0" />
-                            </Style>
-                        </DataGridTextColumn.CellStyle>
-                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="HDR LUT" Width="*" IsReadOnly="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding HdrLutFilename, Mode=OneWay}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox ItemsSource="{Binding HdrLuts}" SelectedItem="{Binding HdrLutPath, UpdateSourceTrigger=PropertyChanged}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" />
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Button Content="-" Click="RemoveHdrLut_Click" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.HeaderTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </DockPanel>

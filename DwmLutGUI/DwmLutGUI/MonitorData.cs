@@ -43,6 +43,7 @@ namespace DwmLutGUI
         public string Position { get; }
 
         public ObservableCollection<string> SdrLuts { get; set; }
+        public ObservableCollection<string> HdrLuts { get; set; }
 
 
         public string SdrLutPath
@@ -50,7 +51,8 @@ namespace DwmLutGUI
             set
             {
                 if (value == _sdrLutPath) return;
-                if (!SdrLuts.Contains(value))
+                if (value == null) return;
+                if (value != "None" && !SdrLuts.Contains(value))
                     SdrLuts.Add(value);
                 _sdrLutPath = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SdrLutFilename)));
@@ -64,6 +66,10 @@ namespace DwmLutGUI
             set
             {
                 if (value == _hdrLutPath) return;
+                if (!HdrLuts.Contains(value))
+                {
+                    HdrLuts.Add(value);
+                }
                 _hdrLutPath = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HdrLutFilename)));
                 StaticPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HdrLutFilename)));
