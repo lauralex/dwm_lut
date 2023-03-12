@@ -203,9 +203,11 @@ namespace DwmLutGUI
 
                     var sdrLutPaths = monitor.Element("sdr_luts")?.Elements("sdr_lut").Select(x => (string)x).ToList();
                     var hdrLutPaths = monitor.Element("hdr_luts")?.Elements("hdr_lut").Select(x => (string)x).ToList();
-                    var newMonitorData = new MonitorData(path, sdrLutPath, hdrLutPath);
-                    newMonitorData.SdrLuts = new ObservableCollection<string>(sdrLutPaths);
-                    newMonitorData.HdrLuts = new ObservableCollection<string>(hdrLutPaths);
+                    var newMonitorData = new MonitorData(path, sdrLutPath, hdrLutPath)
+                    {
+                        SdrLuts = new ObservableCollection<string>(sdrLutPaths),
+                        HdrLuts = new ObservableCollection<string>(hdrLutPaths)
+                    };
                     _allMonitors.Add(newMonitorData);
                 }
             }

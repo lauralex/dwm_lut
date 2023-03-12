@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -11,7 +10,6 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Microsoft.Win32;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace DwmLutGUI
@@ -117,6 +115,9 @@ namespace DwmLutGUI
 
             SystemEvents.DisplaySettingsChanged += _viewModel.OnDisplaySettingsChanged;
             App.KListener.KeyDown += MonitorLutToggle;
+            var keys = Enum.GetValues(typeof(Key)).Cast<Key>().ToList();
+            ToggleKeyCombo.ItemsSource = keys;
+            ToggleKeyCombo.SelectedItem = Key.NumPad1;
         }
 
         protected override void OnStateChanged(EventArgs e)
@@ -254,11 +255,20 @@ namespace DwmLutGUI
 
         private void MonitorLutToggle(object sender, RawKeyEventArgs e)
         {
-            if (e.Key != Key.NumPad1) return;
+            if (e.Key != (Key)ToggleKeyCombo.SelectedItem) return;
             var monitor = _viewModel.SelectedMonitor;
             if (monitor == null) return;
-            _viewModel.SdrLutPath = monitor.SdrLuts[(monitor.SdrLuts.IndexOf(monitor.SdrLutPath) + 1) % monitor.SdrLuts.Count];
-            if (IsActive)
+            if (monitor.SdrLutFilename != "None")
+            {
+                _viewModel.SdrLutPath =
+                    monitor.SdrLuts[(monitor.SdrLuts.IndexOf(monitor.SdrLutPath) + 1) % monitor.SdrLuts.Count];
+            }
+            else
+            {
+                _viewModel.HdrLutPath = monitor.HdrLuts[(monitor.HdrLuts.IndexOf(monitor.HdrLutPath) + 1) % monitor.HdrLuts.Count];
+            }
+
+            if (_viewModel.IsActive)
             {
                 Disable_Click(null, null);
                 Apply_Click(null, null);
