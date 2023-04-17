@@ -19,6 +19,7 @@ namespace DwmLutGUI
         private string _activeText;
         private MonitorData _selectedMonitor;
         private bool _isActive;
+        private Key _toggleKey;
 
         private readonly string _configPath;
 
@@ -83,6 +84,7 @@ namespace DwmLutGUI
         private void SaveConfig()
         {
             var xElem = new XElement("monitors",
+                new XAttribute("lut_toggle", _toggleKey),
                 _allMonitors.Select(x =>
                     new XElement("monitor", new XAttribute("path", x.DevicePath),
                         x.SdrLutPath != null ? new XAttribute("sdr_lut", x.SdrLutPath) : null,
@@ -122,6 +124,18 @@ namespace DwmLutGUI
             get => SelectedMonitor?.HdrLutPath;
         }
 
+        public Key ToggleKey
+        {
+            set
+            {
+                if (value == _toggleKey) return;
+                _toggleKey = value;
+                OnPropertyChanged();
+                SaveConfig();
+            }
+            get => _toggleKey;
+        }
+
         public bool IsActive
         {
             set
@@ -147,6 +161,18 @@ namespace DwmLutGUI
             if (File.Exists(_configPath))
             {
                 config = XElement.Load(_configPath).Descendants("monitor").ToList();
+                try
+                {
+                    _toggleKey = (Key)Enum.Parse(typeof(Key), (string)XElement.Load(_configPath).Attribute("lut_toggle"));
+                }
+                catch
+                {
+                    _toggleKey = Key.Pause;
+                }
+            }
+            else
+            {
+                _toggleKey = Key.Pause;
             }
 
             var paths = WindowsDisplayAPI.DisplayConfig.PathInfo.GetActivePaths();

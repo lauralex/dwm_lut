@@ -54,7 +54,7 @@ namespace DwmLutGUI
                 if (value == null) return;
                 if (value != "None" && !SdrLuts.Contains(value))
                     SdrLuts.Add(value);
-                _sdrLutPath = value;
+                _sdrLutPath = value != "None" ? value : null;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SdrLutFilename)));
                 StaticPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SdrLutFilename)));
             }
@@ -66,11 +66,11 @@ namespace DwmLutGUI
             set
             {
                 if (value == _hdrLutPath) return;
-                if (!HdrLuts.Contains(value))
+                if (value != "None" && !HdrLuts.Contains(value))
                 {
                     HdrLuts.Add(value);
                 }
-                _hdrLutPath = value;
+                _hdrLutPath = value != "None" ? value : null;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HdrLutFilename)));
                 StaticPropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HdrLutFilename)));
             }

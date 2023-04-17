@@ -7,9 +7,12 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
 using Microsoft.Win32;
+using ContextMenu = System.Windows.Forms.ContextMenu;
+using MenuItem = System.Windows.Forms.MenuItem;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace DwmLutGUI
@@ -117,7 +120,6 @@ namespace DwmLutGUI
             App.KListener.KeyDown += MonitorLutToggle;
             var keys = Enum.GetValues(typeof(Key)).Cast<Key>().ToList();
             ToggleKeyCombo.ItemsSource = keys;
-            ToggleKeyCombo.SelectedItem = Key.NumPad1;
         }
 
         protected override void OnStateChanged(EventArgs e)
@@ -175,7 +177,7 @@ namespace DwmLutGUI
 
         private void SdrLutClear_Click(object sender, RoutedEventArgs e)
         {
-            _viewModel.SdrLutPath = null;
+            _viewModel.SdrLutPath = "None";
         }
 
         private void HdrLutBrowse_Click(object sender, RoutedEventArgs e)
@@ -190,7 +192,7 @@ namespace DwmLutGUI
 
         private void HdrLutClear_Click(object sender, RoutedEventArgs e)
         {
-            _viewModel.HdrLutPath = null;
+            _viewModel.HdrLutPath = "None";
         }
 
         private void Disable_Click(object sender, RoutedEventArgs e)
@@ -280,7 +282,7 @@ namespace DwmLutGUI
             var monitor = _viewModel.SelectedMonitor;
             if (monitor == null) return;
             monitor.HdrLuts.Remove(monitor.HdrLutPath);
-            monitor.HdrLutPath = monitor.HdrLuts.FirstOrDefault();
+            monitor.HdrLutPath = monitor.HdrLuts.FirstOrDefault() ?? "None";
         }
     }
 }
