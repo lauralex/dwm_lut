@@ -19,6 +19,7 @@ namespace DwmLutGUI
             string sdrLutPath, string hdrLutPath)
         {
             SdrLuts = new ObservableCollection<string>();
+            HdrLuts = new ObservableCollection<string>();
             DevicePath = devicePath;
             SourceId = sourceId;
             Name = name;
@@ -31,6 +32,7 @@ namespace DwmLutGUI
         public MonitorData(string devicePath, string sdrLutPath, string hdrLutPath)
         {
             SdrLuts = new ObservableCollection<string>();
+            HdrLuts = new ObservableCollection<string>();
             DevicePath = devicePath;
             SdrLutPath = sdrLutPath;
             HdrLutPath = hdrLutPath;

@@ -11,7 +11,7 @@
         SnapsToDevicePixels="True">
     <StackPanel Margin="6">
         <TextBlock FontSize="15" HorizontalAlignment="Center" TextAlignment="Center">
-            dwm_lut v3.9.5 by lauralex (original by ledoge)
+            dwm_lut v3.9.6 by lauralex (original by ledoge)
         </TextBlock>
         <TextBlock HorizontalAlignment="Center" TextAlignment="Center">
             Licensed under GPLv3 <LineBreak /> <LineBreak />
