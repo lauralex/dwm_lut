@@ -1018,12 +1018,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 			}
 
 			// TODO: Remove this debug instruction
-			MESSAGE_BOX_DBG("DWM LUT ATTACH", MB_OK)
+			// MESSAGE_BOX_DBG("DWM LUT ATTACH", MB_OK)
 
 			if (isWindows11)
 			{
 				// TODO: Remove this debug instruction
-				MESSAGE_BOX_DBG("DETECTED WINDOWS 11 OS", MB_OK)
+				// MESSAGE_BOX_DBG("DETECTED WINDOWS 11 OS", MB_OK)
 
 				for (size_t i = 0; i <= moduleInfo.SizeOfImage - sizeof COverlayContext_OverlaysEnabled_bytes_w11; i++)
 				{
@@ -1033,7 +1033,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 						                                      sizeof COverlayContext_Present_bytes_w11))
 					{
 						// TODO: Remove this debug instruction
-						MESSAGE_BOX_DBG("DETECTED COverlayContextPresent address", MB_OK)
+						// MESSAGE_BOX_DBG("DETECTED COverlayContextPresent address", MB_OK)
 
 						COverlayContext_Present_orig = (COverlayContext_Present_t*)address;
 						COverlayContext_Present_real_orig = COverlayContext_Present_orig;
@@ -1057,7 +1057,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 					if (COverlayContext_Present_orig && COverlayContext_IsCandidateDirectFlipCompatbile_orig &&
 						COverlayContext_OverlaysEnabled_orig)
 					{
-						MESSAGE_BOX_DBG("All addresses successfully retrieved", MB_OK)
+						// MESSAGE_BOX_DBG("All addresses successfully retrieved", MB_OK)
 
 						break;
 					}
@@ -1070,7 +1070,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 
 				if (rev >= 706)
 				{
-					MESSAGE_BOX_DBG("Detected recent Windows OS", MB_OK)
+					// MESSAGE_BOX_DBG("Detected recent Windows OS", MB_OK)
 
 					// COverlayContext_DeviceClipBox_offset_w11 += 8;
 				}
@@ -1123,7 +1123,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 			        COverlayContext_Present_orig,
 			        COverlayContext_IsCandidateDirectFlipCompatbile_orig, COverlayContext_OverlaysEnabled_orig);
 
-			MESSAGE_BOX_DBG(variable_message_states, MB_OK)
+			// MESSAGE_BOX_DBG(variable_message_states, MB_OK)
 
 			if (COverlayContext_Present_orig && COverlayContext_IsCandidateDirectFlipCompatbile_orig &&
 				COverlayContext_OverlaysEnabled_orig && numLuts != 0)
@@ -1139,7 +1139,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 				              (PVOID*)&COverlayContext_OverlaysEnabled_orig);
 				MH_EnableHook(MH_ALL_HOOKS);
 				LOG_ONLY_ONCE("DWM HOOK DLL INITIALIZATION. START LOGGING")
-				MESSAGE_BOX_DBG("DWM HOOK INITIALIZATION", MB_OK)
+				// MESSAGE_BOX_DBG("DWM HOOK INITIALIZATION", MB_OK)
 
 				break;
 			}
