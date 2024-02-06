@@ -24,7 +24,11 @@
 #define RESIZE(x, y) realloc(x, (y) * sizeof(*x));
 #define LOG_FILE_PATH R"(C:\DWMLOG\dwm.log)"
 #define MAX_LOG_FILE_SIZE 20 * 1024 * 1024
+#ifdef _DEBUG
 #define DEBUG_MODE true
+#else
+#define DEBUG_MODE false
+#endif
 
 #if DEBUG_MODE == true
 #define __LOG_ONLY_ONCE(x, y) if (static bool first_log_##y = true) { log_to_file(x); first_log_##y = false; }

@@ -83,6 +83,9 @@ namespace DwmLutGUI
 
         private void SaveConfig()
         {
+            if (_allMonitors.Count == 0)
+                return;
+
             var xElem = new XElement("monitors",
                 new XAttribute("lut_toggle", _toggleKey),
                 _allMonitors.Select(x =>
