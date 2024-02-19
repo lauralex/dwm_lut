@@ -1,5 +1,5 @@
 # A fork of the [original dwm_lut](https://github.com/ledoge/dwm_lut) which works also on **Windows 11**
-## [Download latest release](https://github.com/lauralex/dwm_lut/releases/latest/download/Release.zip)
+## [Download latest pre-release](https://github.com/lauralex/dwm_lut/releases/download/v3.9.7/Release.zip)
 If you encounter problems with the 3.9.7 version, download the [3.9.6](https://github.com/lauralex/dwm_lut/releases/download/v3.9.6/Release.zip) version.
 
 # About
