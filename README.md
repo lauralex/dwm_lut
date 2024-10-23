@@ -2,6 +2,9 @@
 ## [Download latest pre-release (supports Windows 24H2 now)](https://github.com/lauralex/dwm_lut/releases/download/v4.0.0/Release24h2.zip)
 If you encounter problems with the 3.9.7 version, download the [3.9.6](https://github.com/lauralex/dwm_lut/releases/download/v3.9.6/Release.zip) version.
 
+## Dependencies
+- Visual C++ runtime (https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/)
+
 # About
 This tool applies 3D LUTs to the Windows desktop by hooking into DWM. It works in both SDR and HDR modes, and uses tetrahedral interpolation on the LUT data. In SDR, blue-noise dithering is applied to the output to reduce banding.
 
