@@ -578,14 +578,28 @@ lutData* GetLUTDataFromCOverlayContext(void* context, bool hdr)
 	if (isWindows11_24h2)
 	{
 		float* rect = (float*)((unsigned char*)*(void**)context + COverlayContext_DeviceClipBox_offset_w11_24h2);
-		left = (int)rect[0];
-		top = (int)rect[1];
+		left = (int)rect[2];
+		top = (int)rect[3];
+		char message_buf[100];
+		sprintf(message_buf, "Left: %d, Top: %d", left, top);
+		LOG_ONLY_ONCE(message_buf)
+		
+		// Put rect address in message
+		sprintf(message_buf, "Rect address: 0x%p", rect);
+		LOG_ONLY_ONCE(message_buf)
 	}
 	else if (isWindows11)
 	{
 		float* rect = (float*)((unsigned char*)*(void**)context + COverlayContext_DeviceClipBox_offset_w11);
 		left = (int)rect[0];
 		top = (int)rect[1];
+		char message_buf[100];
+		sprintf(message_buf, "Left: %d, Top: %d", left, top);
+		LOG_ONLY_ONCE(message_buf)
+
+		// Put rect address in message
+		sprintf(message_buf, "Rect address: 0x%p", rect);
+		LOG_ONLY_ONCE(message_buf)
 	}
 	else
 	{
@@ -828,6 +842,10 @@ bool ApplyLUT(void* cOverlayContext, IDXGISwapChain* swapChain, struct tagRECT* 
 		lutData* lut;
 		if (index == -1 || !(lut = GetLUTDataFromCOverlayContext(cOverlayContext, index == 1)))
 		{
+			// Create char array with index appended
+			char message[256];
+			sprintf(message, "LUT not found for index %d", index);
+			LOG_ONLY_ONCE(message)
 			backBuffer->Release();
 			return false;
 		}
@@ -946,7 +964,7 @@ COverlayContext_Present_24h2_t* COverlayContext_Present_real_orig_24h2 = NULL;
 long long COverlayContext_Present_hook_24h2(void* self, void* overlaySwapChain, unsigned int a3, rectVec* rectVec,
 	int a5, void* a6, bool a7)
 {
-	if (_ReturnAddress() < (void*)COverlayContext_Present_real_orig_24h2)
+	if (_ReturnAddress() < (void*)COverlayContext_Present_real_orig_24h2 || isWindows11_24h2)
 	{
 		LOG_ONLY_ONCE("I am inside COverlayContext::Present hook inside the main if condition")
 
@@ -1165,7 +1183,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 			{
 				MESSAGE_BOX_DBG("DETECTED WINDOWS 11 24H2 OS", MB_OK)
 
-				for (size_t i = 0; i <= moduleInfo.SizeOfImage - sizeof COverlayContext_OverlaysEnabled_bytes_w11; i++)
+				for (size_t i = 0; i <= moduleInfo.SizeOfImage - sizeof COverlayContext_OverlaysEnabled_bytes_w11_24h2; i++)
 				{
 					unsigned char* address = (unsigned char*)dwmcore + i;
 					if (!COverlayContext_Present_orig && sizeof COverlayContext_Present_bytes_w11_24h2 <= moduleInfo.
