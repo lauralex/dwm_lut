@@ -146,8 +146,11 @@ namespace DwmLutGUI
             var failed = false;
             var bytes = Encoding.ASCII.GetBytes(DllPath);
             var dwmInstances = Process.GetProcessesByName("dwm");
+            var currentSessionId = Process.GetCurrentProcess().SessionId;
             foreach (var dwm in dwmInstances)
             {
+                // Check if dwm instance has the same session id as the current process
+                if (dwm.SessionId != currentSessionId) continue;
                 var address = VirtualAllocEx(dwm.Handle, IntPtr.Zero, (UIntPtr)bytes.Length,
                     AllocationType.Reserve | AllocationType.Commit, MemoryProtection.ReadWrite);
                 WriteProcessMemory(dwm.Handle, address, bytes, (UIntPtr)bytes.Length, out _);
@@ -177,9 +180,12 @@ namespace DwmLutGUI
 
         public static void Uninject()
         {
+            var currentSessionId = Process.GetCurrentProcess().SessionId;
             var dwmInstances = Process.GetProcessesByName("dwm");
             foreach (var dwm in dwmInstances)
             {
+                // Check if dwm instance has the same session id as the current process
+                if (dwm.SessionId != currentSessionId) continue;
                 var modules = dwm.Modules;
                 foreach (ProcessModule module in modules)
                 {
@@ -187,7 +193,7 @@ namespace DwmLutGUI
                     {
                         var thread = CreateRemoteThread(dwm.Handle, IntPtr.Zero, 0, FreeLibrary, module.BaseAddress,
                             0, out _);
-                        WaitForSingleObject(thread, uint.MaxValue);
+                        WaitForSingleObject(thread, 3000);
                         CloseHandle(thread);
                     }
 
@@ -197,7 +203,7 @@ namespace DwmLutGUI
                 dwm.Dispose();
             }
 
-            File.Delete(DllPath);
+            //File.Delete(DllPath);
         }
 
         private static void ClearPermissions(string path)
