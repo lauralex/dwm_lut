@@ -134,6 +134,14 @@ unsigned int lut_index(const unsigned int b, const unsigned int g, const unsigne
 
 #define LUT_ACCESS_INDEX(lut, b, g, r, c, lut_size) (*((float*)(lut) + lut_index(b, g, r, c, lut_size)))
 
+// Find relative address utility function
+void* get_relative_address(void* instruction_address, int offset, int instruction_size)
+{
+	int relative_offset = *(int*)((unsigned char*)instruction_address + offset);
+
+	return (unsigned char*)instruction_address + instruction_size + relative_offset;
+}
+
 
 const unsigned char COverlayContext_Present_bytes[] = {
 	0x48, 0x89, 0x5c, 0x24, 0x08, 0x48, 0x89, 0x74, 0x24, 0x10, 0x57, 0x48, 0x83, 0xec, 0x40, 0x48, 0x8b, 0xb1, 0x20,
@@ -201,19 +209,19 @@ const unsigned char COverlayContext_Present_bytes_w11_24h2[] = {
 const int IOverlaySwapChain_IDXGISwapChain_offset_w11_24h2 = 0x108; // wrt OverlaySwapChain
 
 const unsigned char COverlayContext_IsCandidateDirectFlipCompatbile_bytes_w11_24h2[] = {
-	0x48, 0x8B, 0xC4, 0x48, 0x89, 0x58, '?', 0x48, 0x89, 0x68, '?', 0x48, 0x89, 0x70, '?', 0x48, 0x89, 0x78, '?', 0x41, 0x56, 0x48, 0x83, 0xEC, '?', 0x33, 0xDB, 0x49, 0x8B, 0xE9
+	0x48, 0x8B, 0xC4, 0x48, 0x89, 0x58, '?', 0x48, 0x89, 0x68, '?', 0x48, 0x89, 0x70, '?', 0x48, 0x89, 0x78, '?', 0x41, 0x56, 0x48, 0x83, 0xEC, 0x20, 0x33, 0xDB
 };
 
-const unsigned char COverlayContext_OverlaysEnabled_bytes_w11_24h2[] = {
-	0x83, 0x3D, '?', '?', '?', '?', '?', 0x74, '?', 0x83, 0x79, '?', '?', 0x0F, 0x97, 0xC0, 0xC3, 0xCC, 0x32, 0xC0, 0xC3, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0x48, 0x89, 0x4C, 0x24
+const unsigned char COverlayContext_OverlaysEnabled_bytes_relative_w11_24h2[] = {
+	0xE8, '?', '?', '?', '?', 0x84, 0xC0, 0xB8, 0x04, 0x00, 0x00, 0x00
 };
 
 int COverlayContext_DeviceClipBox_offset_w11_24h2 = 0x53E8;
 
 const int IOverlaySwapChain_HardwareProtected_offset_w11_24h2 = 0x64;
 
-bool isWindows11;
-bool isWindows11_24h2;
+bool isWindows11 = false;
+bool isWindows11_24h2 = false;
 
 bool aob_match_inverse(const void* buf1, const void* mask, const int buf_len)
 {
@@ -966,16 +974,19 @@ long long COverlayContext_Present_hook_24h2(void* self, void* overlaySwapChain, 
 {
 	if (_ReturnAddress() < (void*)COverlayContext_Present_real_orig_24h2 || isWindows11_24h2)
 	{
-		LOG_ONLY_ONCE("I am inside COverlayContext::Present hook inside the main if condition")
-
+			LOG_ONLY_ONCE("I am inside COverlayContext::Present hook inside the main if condition")
+			std::stringstream overlay_swapchain_message;
+			overlay_swapchain_message << "OverlaySwapChain address: 0x" << std::hex << overlaySwapChain << " -- windows 11 24h2: " << isWindows11_24h2
+				<< " -- " << "windows 11: " << isWindows11;
+			LOG_ONLY_ONCE(overlay_swapchain_message.str().c_str())
 			if ((isWindows11_24h2 && *((bool*)overlaySwapChain + IOverlaySwapChain_HardwareProtected_offset_w11_24h2)) ||
 				(isWindows11 && *((bool*)overlaySwapChain + IOverlaySwapChain_HardwareProtected_offset_w11)) ||
 				(!(isWindows11 || isWindows11_24h2) && *((bool*)overlaySwapChain + IOverlaySwapChain_HardwareProtected_offset)))
 			{
 				std::stringstream hw_protection_message;
 				hw_protection_message << "I'm inside the Hardware protection condition - 0x" << std::hex << (bool*)
-					overlaySwapChain + IOverlaySwapChain_HardwareProtected_offset_w11 << " - value: 0x" << *((bool*)
-						overlaySwapChain + IOverlaySwapChain_HardwareProtected_offset_w11);
+					overlaySwapChain + (!isWindows11_24h2 ? (!isWindows11 ? IOverlaySwapChain_HardwareProtected_offset : IOverlaySwapChain_HardwareProtected_offset_w11) : IOverlaySwapChain_HardwareProtected_offset_w11_24h2)  << " - value: 0x" << *((bool*)
+						overlaySwapChain + (!isWindows11_24h2 ? (!isWindows11 ? IOverlaySwapChain_HardwareProtected_offset : IOverlaySwapChain_HardwareProtected_offset_w11) : IOverlaySwapChain_HardwareProtected_offset_w11_24h2));
 				LOG_ONLY_ONCE(hw_protection_message.str().c_str())
 					UnsetLUTActive(self);
 			}
@@ -1167,7 +1178,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 			{
 				isWindows11_24h2 = true;
 			}
-			if (VerifyVersionInfo(&versionInfo, VER_BUILDNUMBER, dwlConditionMask))
+			else if (VerifyVersionInfo(&versionInfo, VER_BUILDNUMBER, dwlConditionMask))
 			{
 				isWindows11 = true;
 			}
@@ -1183,7 +1194,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 			{
 				MESSAGE_BOX_DBG("DETECTED WINDOWS 11 24H2 OS", MB_OK)
 
-				for (size_t i = 0; i <= moduleInfo.SizeOfImage - sizeof COverlayContext_OverlaysEnabled_bytes_w11_24h2; i++)
+				for (size_t i = 0; i <= moduleInfo.SizeOfImage - sizeof COverlayContext_OverlaysEnabled_bytes_relative_w11_24h2; i++)
 				{
 					unsigned char* address = (unsigned char*)dwmcore + i;
 					if (!COverlayContext_Present_orig && sizeof COverlayContext_Present_bytes_w11_24h2 <= moduleInfo.
@@ -1205,12 +1216,14 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 						COverlayContext_IsCandidateDirectFlipCompatbile_orig_24h2 = (
 							COverlayContext_IsCandidateDirectFlipCompatbile_24h2_t*)address;
 					}
-					else if (!COverlayContext_OverlaysEnabled_orig && sizeof COverlayContext_OverlaysEnabled_bytes_w11_24h2
+					else if (!COverlayContext_OverlaysEnabled_orig && sizeof COverlayContext_OverlaysEnabled_bytes_relative_w11_24h2
 						<= moduleInfo.SizeOfImage - i && !aob_match_inverse(
-							address, COverlayContext_OverlaysEnabled_bytes_w11_24h2,
-							sizeof COverlayContext_OverlaysEnabled_bytes_w11_24h2))
+							address, COverlayContext_OverlaysEnabled_bytes_relative_w11_24h2,
+							sizeof COverlayContext_OverlaysEnabled_bytes_relative_w11_24h2))
 					{
-						COverlayContext_OverlaysEnabled_orig = (COverlayContext_OverlaysEnabled_t*)address;
+
+
+						COverlayContext_OverlaysEnabled_orig = (COverlayContext_OverlaysEnabled_t*)get_relative_address(address, 1, 5);
 					}
 					if (COverlayContext_Present_orig && COverlayContext_IsCandidateDirectFlipCompatbile_orig &&
 						COverlayContext_OverlaysEnabled_orig)
@@ -1319,10 +1332,18 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 				return FALSE;
 			}
 			char variable_message_states[300];
-			sprintf(variable_message_states, "Current variable states: COverlayContext::Present - %p\t"
-			        "COverlayContext::IsCandidateDirectFlipCompatible - %p\tCOverlayContext::OverlaysEnabled - %p",
-			        COverlayContext_Present_orig,
-			        COverlayContext_IsCandidateDirectFlipCompatbile_orig, COverlayContext_OverlaysEnabled_orig);
+			if (!isWindows11_24h2) {
+				sprintf(variable_message_states, "Current variable states: COverlayContext::Present - %p\t"
+					"COverlayContext::IsCandidateDirectFlipCompatible - %p\tCOverlayContext::OverlaysEnabled - %p",
+					COverlayContext_Present_orig,
+					COverlayContext_IsCandidateDirectFlipCompatbile_orig, COverlayContext_OverlaysEnabled_orig);
+			}
+			else {
+				sprintf(variable_message_states, "Current variable states: COverlayContext::Present - %p\t"
+					"COverlayContext::IsCandidateDirectFlipCompatible - %p\tCOverlayContext::OverlaysEnabled - %p",
+					COverlayContext_Present_orig_24h2,
+					COverlayContext_IsCandidateDirectFlipCompatbile_orig_24h2, COverlayContext_OverlaysEnabled_orig);
+			}
 
 			MESSAGE_BOX_DBG(variable_message_states, MB_OK)
 
